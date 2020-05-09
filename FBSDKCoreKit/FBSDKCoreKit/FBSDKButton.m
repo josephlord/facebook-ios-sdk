@@ -20,8 +20,6 @@
 #import "FBSDKButton+Subclass.h"
 
 #import "FBSDKAccessToken.h"
-#import "FBSDKAppEvents+Internal.h"
-#import "FBSDKAppEvents.h"
 #import "FBSDKApplicationDelegate+Internal.h"
 #import "FBSDKLogo.h"
 #import "FBSDKUIUtility.h"
@@ -165,10 +163,7 @@
 
 - (void)logTapEventWithEventName:(NSString *)eventName parameters:(NSDictionary *)parameters
 {
-  [FBSDKAppEvents logInternalEvent:eventName
-                        parameters:parameters
-                isImplicitlyLogged:YES
-                       accessToken:[FBSDKAccessToken currentAccessToken]];
+
 }
 
 - (void)checkImplicitlyDisabled

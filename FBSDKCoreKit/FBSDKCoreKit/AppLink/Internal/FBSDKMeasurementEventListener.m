@@ -22,8 +22,6 @@
 
 #import "FBSDKMeasurementEventListener.h"
 
-#import "FBSDKAppEvents+Internal.h"
-#import "FBSDKTimeSpentData.h"
 
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 
@@ -54,32 +52,6 @@ static NSString *const FBSDKMeasurementEventPrefix = @"bf_";
                      object:nil];
     });
     return defaultListener;
-}
-
-- (void)logFBAppEventForNotification:(NSNotification *)note
-{
-    // when catch al_nav_in event, we set source application for FBAppEvents.
-    if ([note.userInfo[FBSDKMeasurementEventName] isEqualToString:@"al_nav_in"]) {
-        NSString *sourceApplication = note.userInfo[FBSDKMeasurementEventArgs][@"sourceApplication"];
-        if (sourceApplication) {
-            [FBSDKTimeSpentData setSourceApplication:sourceApplication isFromAppLink:YES];
-        }
-    }
-    NSDictionary<NSString *, id> *eventArgs = note.userInfo[FBSDKMeasurementEventArgs];
-    NSMutableDictionary<NSString *, id> *logData = [[NSMutableDictionary alloc] init];
-    for (NSString *key in eventArgs.allKeys) {
-        NSError *error = nil;
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"[^0-9a-zA-Z _-]" options:0 error:&error];
-        NSString *safeKey = [regex stringByReplacingMatchesInString:key
-                                                            options:0
-                                                              range:NSMakeRange(0, key.length)
-                                                       withTemplate:@"-"];
-        safeKey = [safeKey stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@" -"]];
-        logData[safeKey] = eventArgs[key];
-    }
-    [FBSDKAppEvents logInternalEvent:[FBSDKMeasurementEventPrefix stringByAppendingString:note.userInfo[FBSDKMeasurementEventName]]
-                          parameters:logData
-                  isImplicitlyLogged:YES];
 }
 
 - (void)dealloc

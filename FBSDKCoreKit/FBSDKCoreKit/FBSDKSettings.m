@@ -20,7 +20,6 @@
 
 #import "FBSDKAccessTokenCache.h"
 #import "FBSDKAccessTokenExpirer.h"
-#import "FBSDKAppEvents+Internal.h"
 #import "FBSDKCoreKit.h"
 
 #define FBSDKSETTINGS_PLIST_CONFIGURATION_SETTING_IMPL(TYPE, PLIST_KEY, GETTER, SETTER, DEFAULT_VALUE, ENABLE_CACHE) \
@@ -326,35 +325,7 @@ FBSDKSETTINGS_PLIST_CONFIGURATION_SETTING_IMPL(NSNumber, FacebookCodelessDebugLo
 
 + (void)_logIfSDKSettingsChanged
 {
-  NSInteger bitmask = 0;
-  NSInteger bit = 0;
-  bitmask |= ([FBSDKSettings isAutoInitEnabled] ? 1 : 0) << bit++;
-  bitmask |= ([FBSDKSettings isAutoLogAppEventsEnabled] ? 1 : 0) << bit++;
-  bitmask |= ([FBSDKSettings isAdvertiserIDCollectionEnabled] ? 1 : 0) << bit++;
-
-  NSInteger previousBitmask = [[NSUserDefaults standardUserDefaults] integerForKey:FBSDKSettingsBitmask];
-  if (previousBitmask != bitmask) {
-    [[NSUserDefaults standardUserDefaults] setInteger:bitmask forKey:FBSDKSettingsBitmask];
-
-    NSArray<NSString *> *keys = @[@"FacebookAutoInitEnabled",
-                                  @"FacebookAutoLogAppEventsEnabled",
-                                  @"FacebookAdvertiserIDCollectionEnabled"];
-    NSArray<NSNumber *> *defaultValues = @[@YES, @YES, @YES];
-    NSInteger initialBitmask = 0;
-    NSInteger usageBitmask = 0;
-    for (int i = 0; i < keys.count; i++) {
-      NSNumber *plistValue = [[NSBundle mainBundle] objectForInfoDictionaryKey:keys[i]];
-      BOOL initialValue = [(plistValue ?: defaultValues[i]) boolValue];
-      initialBitmask |= (initialValue ? 1 : 0) << i;
-      usageBitmask |= (plistValue != nil ? 1 : 0) << i;
-    }
-    [FBSDKAppEvents logInternalEvent:@"fb_sdk_settings_changed"
-                          parameters:@{@"usage": @(usageBitmask),
-                                       @"initial": @(initialBitmask),
-                                       @"previous":@(previousBitmask),
-                                       @"current": @(bitmask)}
-                  isImplicitlyLogged:YES];
-  }
+    // Do nothing PrivateFBSDK
 }
 
 #pragma mark - Internal - Graph API Debug

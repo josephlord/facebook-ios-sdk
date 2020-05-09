@@ -23,7 +23,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "FBSDKAppEventsUtility.h"
 #import "FBSDKGraphRequest+Internal.h"
 #import "FBSDKGraphRequest.h"
 #import "FBSDKInternalUtility.h"

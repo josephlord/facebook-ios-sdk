@@ -18,7 +18,6 @@
 
 #import "FBSDKServerConfiguration.h"
 #import "FBSDKServerConfiguration+Internal.h"
-#import "FBSDKMonitoringConfiguration.h"
 #import "FBSDKInternalUtility.h"
 
 // one minute
@@ -187,7 +186,7 @@ implicitPurchaseLoggingEnabled:(BOOL)implicitPurchaseLoggingEnabled
                                                                 restrictiveParams:nil
                                                                          AAMRules:nil
                                                            suggestedEventsSetting:nil
-                                                          monitoringConfiguration:FBSDKMonitoringConfiguration.defaultConfiguration
+                                                          monitoringConfiguration:nil
                                    ];
   }
   return _defaultServerConfiguration;
@@ -274,7 +273,6 @@ implicitPurchaseLoggingEnabled:(BOOL)implicitPurchaseLoggingEnabled
   NSDictionary<NSString *, id> *AAMRules = [decoder decodeObjectOfClass:[NSDictionary class] forKey:FBSDK_SERVER_CONFIGURATION_AAM_RULES];
   NSDictionary<NSString *, id> *suggestedEventsSetting = [decoder decodeObjectOfClass:[NSDictionary class] forKey:FBSDK_SERVER_CONFIGURATION_SUGGESTED_EVENTS_SETTING];
   NSInteger version = [decoder decodeIntegerForKey:FBSDK_SERVER_CONFIGURATION_VERSION_KEY];
-  FBSDKMonitoringConfiguration *monitoringConfiguration = [decoder decodeObjectOfClass:FBSDKMonitoringConfiguration.class forKey:FBSDK_SERVER_CONFIGURATION_MONITORING_CONFIGURATION_KEY];
   FBSDKServerConfiguration *configuration = [self initWithAppID:appID
                                                         appName:appName
                                             loginTooltipEnabled:loginTooltipEnabled
@@ -300,7 +298,7 @@ implicitPurchaseLoggingEnabled:(BOOL)implicitPurchaseLoggingEnabled
                                               restrictiveParams:restrictiveParams
                                                        AAMRules:AAMRules
                                          suggestedEventsSetting:suggestedEventsSetting
-                                        monitoringConfiguration:monitoringConfiguration
+                                        monitoringConfiguration:nil
                                              ];
   configuration->_version = version;
   return configuration;

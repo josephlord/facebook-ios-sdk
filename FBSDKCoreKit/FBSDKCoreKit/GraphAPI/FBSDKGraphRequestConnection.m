@@ -18,7 +18,6 @@
 
 #import "FBSDKGraphRequestConnection+Internal.h"
 
-#import "FBSDKAppEvents+Internal.h"
 #import "FBSDKConstants.h"
 #import "FBSDKCoreKit+Internal.h"
 #import "FBSDKError.h"
@@ -656,14 +655,6 @@ NSURLSessionDataDelegate
   NSString *responseUTF8 = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
   NSMutableArray *results = [[NSMutableArray alloc] init];;
   id response = [self parseJSONOrOtherwise:responseUTF8 error:error];
-
-  if (responseUTF8 == nil) {
-    NSString *base64Data = data.length != 0 ? [data base64EncodedStringWithOptions:0] : @"";
-    if (base64Data != nil) {
-      [FBSDKAppEvents logInternalEvent:@"fb_response_invalid_utf8"
-                    isImplicitlyLogged:YES];
-    }
-  }
 
   NSDictionary *responseError = nil;
   if (!response) {

@@ -22,17 +22,52 @@
 
 #import "FBSDKAppLinkUtility.h"
 
-#import "FBSDKAppEventsUtility.h"
 #import "FBSDKGraphRequest.h"
 #import "FBSDKInternalUtility.h"
 #import "FBSDKSettings.h"
 #import "FBSDKURL.h"
 #import "FBSDKUtility.h"
 
+#define FBSDK_APPEVENTSUTILITY_ANONYMOUSID_KEY @"anon_id"
+
 static NSString *const FBSDKLastDeferredAppLink = @"com.facebook.sdk:lastDeferredAppLink%@";
 static NSString *const FBSDKDeferredAppLinkEvent = @"DEFERRED_APP_LINK";
 
 @implementation FBSDKAppLinkUtility {}
+
+
++ (NSMutableDictionary *)activityParametersDictionaryForEvent:(NSString *)eventCategory
+                                    shouldAccessAdvertisingID:(BOOL)shouldAccessAdvertisingID {
+  NSMutableDictionary *parameters = [NSMutableDictionary dictionary];
+  parameters[@"event"] = eventCategory;
+
+  parameters[FBSDK_APPEVENTSUTILITY_ANONYMOUSID_KEY] = [FBSDKBasicUtility anonymousID];
+
+  parameters[@"advertiser_tracking_enabled"] = @(NO).stringValue;
+
+  parameters[@"application_tracking_enabled"] = @(NO).stringValue;
+  parameters[@"advertiser_id_collection_enabled"] = @(NO).stringValue;
+
+  static dispatch_once_t fetchBundleOnce;
+  static NSMutableArray *urlSchemes;
+
+  dispatch_once(&fetchBundleOnce, ^{
+    NSBundle *mainBundle = [NSBundle mainBundle];
+    urlSchemes = [[NSMutableArray alloc] init];
+    for (NSDictionary<NSString *, id> *fields in [mainBundle objectForInfoDictionaryKey:@"CFBundleURLTypes"]) {
+      NSArray<NSString *> *schemesForType = fields[@"CFBundleURLSchemes"];
+      if (schemesForType) {
+        [urlSchemes addObjectsFromArray:schemesForType];
+      }
+    }
+  });
+
+  if (urlSchemes.count > 0) {
+    parameters[@"url_schemes"] = [FBSDKBasicUtility JSONStringForObject:urlSchemes error:NULL invalidObjectHandler:NULL];
+  }
+
+  return parameters;
+}
 
 + (void)fetchDeferredAppLink:(FBSDKURLBlock)handler
 {
@@ -44,8 +79,8 @@ static NSString *const FBSDKDeferredAppLinkEvent = @"DEFERRED_APP_LINK";
   // If this is considered for organic, non-ads scenarios, we'll need to retrieve the FBAppEventsUtility.shouldAccessAdvertisingID
   // before we make this call.
   NSMutableDictionary *deferredAppLinkParameters =
-  [FBSDKAppEventsUtility activityParametersDictionaryForEvent:FBSDKDeferredAppLinkEvent
-                                    shouldAccessAdvertisingID:YES];
+  [FBSDKAppLinkUtility activityParametersDictionaryForEvent:FBSDKDeferredAppLinkEvent
+                                    shouldAccessAdvertisingID:NO];
 
   FBSDKGraphRequest *deferredAppLinkRequest = [[FBSDKGraphRequest alloc] initWithGraphPath:[NSString stringWithFormat:@"%@/activities", appID, nil]
                                                                                 parameters:deferredAppLinkParameters

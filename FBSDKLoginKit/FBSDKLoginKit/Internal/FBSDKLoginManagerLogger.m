@@ -99,32 +99,18 @@ static NSString *const FBSDKLoginManagerLoggerTryBrowser = @"trySafariAuth";
 
 - (void)startSessionForLoginManager:(FBSDKLoginManager *)loginManager
 {
-  BOOL isReauthorize = ([FBSDKAccessToken currentAccessToken] != nil);
-  BOOL willTryNative = NO;
-  BOOL willTryBrowser = YES;
-  NSString *behaviorString = @"FBSDKLoginBehaviorBrowser";
 
-  [_extras addEntriesFromDictionary:@{
-    FBSDKLoginManagerLoggerTryNative : @(willTryNative),
-    FBSDKLoginManagerLoggerTryBrowser : @(willTryBrowser),
-    @"isReauthorize" : @(isReauthorize),
-    @"login_behavior" : behaviorString,
-    @"default_audience" : [FBSDKLoginUtility stringForAudience:loginManager.defaultAudience],
-    @"permissions" : [loginManager.requestedPermissions.allObjects componentsJoinedByString:@","] ?: @""
-  }];
-
-  [self logEvent:FBSDKAppEventNameFBSessionAuthStart params:[self _parametersForNewEvent]];
 }
 
 - (void)endSession
 {
-    [self logEvent:FBSDKAppEventNameFBSessionAuthEnd result:_lastResult error:_lastError];
+
 }
 
 - (void)startAuthMethod:(NSString *)authMethod
 {
   _authMethod = [authMethod copy];
-  [self logEvent:FBSDKAppEventNameFBSessionAuthMethodStart params:[self _parametersForNewEvent]];
+
 }
 
 - (void)endLoginWithResult:(FBSDKLoginManagerLoginResult *)result error:(NSError *)error
@@ -148,7 +134,7 @@ static NSString *const FBSDKLoginManagerLoggerTryBrowser = @"trySafariAuth";
   _lastError = error;
   [_extras addEntriesFromDictionary:result.loggingExtras];
 
-  [self logEvent:FBSDKAppEventNameFBSessionAuthMethodEnd result:resultString error:error];
+
 }
 
 - (NSDictionary *)parametersWithTimeStampAndClientState:(NSDictionary *)loginParams forAuthMethod:(NSString *)authMethod
@@ -184,12 +170,7 @@ static NSString *const FBSDKLoginManagerLoggerTryBrowser = @"trySafariAuth";
 
 - (void)logNativeAppDialogResult:(BOOL)result dialogDuration:(NSTimeInterval)dialogDuration
 {
-  NSOperatingSystemVersion iOS10Version = { .majorVersion = 10, .minorVersion = 0, .patchVersion = 0 };
-  if ([FBSDKInternalUtility isOSRunTimeVersionAtLeast:iOS10Version]) {
-    _extras[@"native_app_login_dialog_duration"] = @(dialogDuration);
-    _extras[@"native_app_login_dialog_result"] = @(result);
-    [self logEvent:FBSDKAppEventNameFBSessionFASLoginDialogResult params:[self _parametersForNewEvent]];
-  }
+
 }
 
 #pragma mark - Private
@@ -230,52 +211,11 @@ static NSString *const FBSDKLoginManagerLoggerTryBrowser = @"trySafariAuth";
 
 - (void)logEvent:(NSString *)eventName params:(NSMutableDictionary *)params
 {
-  if (_identifier) {
-    NSString *extrasJSONString = [FBSDKBasicUtility JSONStringForObject:_extras
-                                                                     error:NULL
-                                                      invalidObjectHandler:NULL];
-    if (extrasJSONString) {
-        params[FBSDKLoginManagerLoggerParamExtrasKey] = extrasJSONString;
-    }
-    [_extras removeAllObjects];
 
-    [FBSDKAppEvents logInternalEvent:eventName
-                          parameters:params
-                  isImplicitlyLogged:YES];
-  }
 }
 
 - (void)logEvent:(NSString *)eventName result:(NSString *)result error:(NSError *)error
 {
-  NSMutableDictionary *params = [self _parametersForNewEvent];
-
-  params[FBSDKLoginManagerLoggerParamResultKey] = result;
-
-  if ([error.domain isEqualToString:FBSDKErrorDomain] || [error.domain isEqualToString:FBSDKLoginErrorDomain]) {
-    // tease apart the structure.
-
-    // first see if there is an explicit message in the error's userInfo. If not, default to the reason,
-    // which is less useful.
-    NSString *value = error.userInfo[@"error_message"] ?: error.userInfo[FBSDKErrorLocalizedDescriptionKey];
-    [FBSDKBasicUtility dictionary:params setObject:value forKey:FBSDKLoginManagerLoggerParamErrorMessageKey];
-
-    value = error.userInfo[FBSDKGraphRequestErrorGraphErrorCodeKey] ?: [NSString stringWithFormat:@"%ld", (long)error.code];
-    [FBSDKBasicUtility dictionary:params setObject:value forKey:FBSDKLoginManagerLoggerParamErrorCodeKey];
-
-    NSError *innerError = error.userInfo[NSUnderlyingErrorKey];
-    if (innerError != nil) {
-      value = innerError.userInfo[@"error_message"] ?: innerError.userInfo[NSLocalizedDescriptionKey];
-      [FBSDKBasicUtility dictionary:_extras setObject:value forKey:@"inner_error_message"];
-
-      value = innerError.userInfo[FBSDKGraphRequestErrorGraphErrorCodeKey] ?: [NSString stringWithFormat:@"%ld", (long)innerError.code];
-      [FBSDKBasicUtility dictionary:_extras setObject:value forKey:@"inner_error_code"];
-    }
-  } else if (error) {
-    params[FBSDKLoginManagerLoggerParamErrorCodeKey] = @(error.code);
-    params[FBSDKLoginManagerLoggerParamErrorMessageKey] = error.localizedDescription;
-  }
-
-  [self logEvent:eventName params:params];
 }
 
 @end
