@@ -20,15 +20,12 @@
 
 #import <objc/runtime.h>
 
-#import "FBSDKAppEventsUtility.h"
-#import "FBSDKEventDeactivationManager.h"
 #import "FBSDKGateKeeperManager.h"
 #import "FBSDKGraphRequest+Internal.h"
 #import "FBSDKGraphRequest.h"
 #import "FBSDKImageDownloader.h"
 #import "FBSDKInternalUtility.h"
 #import "FBSDKLogger.h"
-#import "FBSDKRestrictiveDataFilterManager.h"
 #import "FBSDKServerConfiguration+Internal.h"
 #import "FBSDKServerConfiguration.h"
 #import "FBSDKSettings.h"
@@ -211,7 +208,7 @@ typedef NS_OPTIONS(NSUInteger, FBSDKServerConfigurationManagerAppEventsFeatures)
   NSDictionary<NSString *, id> *restrictiveParams = [FBSDKBasicUtility objectForJSONString:resultDictionary[FBSDK_SERVER_CONFIGURATION_RESTRICTIVE_PARAMS_FIELD] error:nil];
   NSDictionary<NSString *, id> *AAMRules = [FBSDKBasicUtility objectForJSONString:resultDictionary[FBSDK_SERVER_CONFIGURATION_AAM_RULES_FIELD] error:nil];
   NSDictionary<NSString *, id> *suggestedEventsSetting = [FBSDKBasicUtility objectForJSONString:resultDictionary[FBSDK_SERVER_CONFIGURATION_SUGGESTED_EVENTS_SETTING_FIELD] error:nil];
-  FBSDKMonitoringConfiguration *monitoringConfiguration = [FBSDKMonitoringConfiguration fromDictionary:resultDictionary[FBSDK_SERVER_CONFIGURATION_MONITORING_CONFIG_FIELD]];
+
   FBSDKServerConfiguration *serverConfiguration = [[FBSDKServerConfiguration alloc] initWithAppID:appID
                                                                                           appName:appName
                                                                               loginTooltipEnabled:loginTooltipEnabled
@@ -237,11 +234,8 @@ typedef NS_OPTIONS(NSUInteger, FBSDKServerConfigurationManagerAppEventsFeatures)
                                                                                 restrictiveParams:restrictiveParams
                                                                                          AAMRules:AAMRules
                                                                            suggestedEventsSetting:suggestedEventsSetting
-                                                                          monitoringConfiguration:monitoringConfiguration];
-  if (restrictiveParams) {
-    [FBSDKRestrictiveDataFilterManager updateFilters:restrictiveParams];
-    [FBSDKEventDeactivationManager updateDeactivatedEvents:restrictiveParams];
-  }
+                                                                          monitoringConfiguration:nil];
+
 #if TARGET_OS_TV
   // don't download icons more than once a day.
   static const NSTimeInterval kSmartLoginIconsTTL = 60 * 60 * 24;

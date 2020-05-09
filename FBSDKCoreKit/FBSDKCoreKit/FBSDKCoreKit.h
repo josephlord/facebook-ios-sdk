@@ -57,7 +57,6 @@
 #else
 
 #import "FBSDKAccessToken.h"
-#import "FBSDKAppEvents.h"
 #import "FBSDKApplicationDelegate.h"
 #import "FBSDKButton.h"
 #import "FBSDKConstants.h"

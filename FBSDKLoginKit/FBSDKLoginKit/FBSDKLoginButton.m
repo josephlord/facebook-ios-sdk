@@ -143,23 +143,6 @@ static const CGFloat kPaddingBetweenLogoTitle = 8.0;
   return CGSizeMake(buttonWidth, kButtonHeight);
 }
 
-#pragma mark - FBSDKButtonImpressionTracking
-
-- (NSDictionary *)analyticsParameters
-{
-  return nil;
-}
-
-- (NSString *)impressionTrackingEventName
-{
-  return FBSDKAppEventNameFBSDKLoginButtonImpression;
-}
-
-- (NSString *)impressionTrackingIdentifier
-{
-  return @"login";
-}
-
 #pragma mark - FBSDKButton
 
 - (void)configureButton
@@ -205,7 +188,6 @@ static const CGFloat kPaddingBetweenLogoTitle = 8.0;
 
 - (void)_buttonPressed:(id)sender
 {
-  [self logTapEventWithEventName:FBSDKAppEventNameFBSDKLoginButtonDidTap parameters:self.analyticsParameters];
   if (FBSDKAccessToken.isCurrentAccessTokenActive) {
     NSString *title = nil;
 

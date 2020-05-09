@@ -100,11 +100,6 @@
 #else
 
 #if !TARGET_OS_TV
-#import "../AppEvents/Internal/ViewHierarchy/FBSDKViewHierarchy.h"
-#import "../AppEvents/Internal/ViewHierarchy/FBSDKViewHierarchyMacros.h"
-#import "../AppEvents/Internal/Codeless/FBSDKCodelessIndexer.h"
-#import "../AppEvents/Internal/AAM/FBSDKMetadataIndexer.h"
-#import "../AppEvents/Internal/SuggestedEvents/FBSDKSuggestedEventsIndexer.h"
 #import "Cryptography/FBSDKCrypto.h"
 #import "FBSDKAudioResourceLoader.h"
 #import "FBSDKContainerViewController.h"
@@ -125,13 +120,6 @@
 #import "Device/FBSDKModalFormPresentationController.h"
 #endif
 
-#import "../AppEvents/Internal/FBSDKAppEvents+Internal.h"
-#import "../AppEvents/Internal/FBSDKAppEventsState.h"
-#import "../AppEvents/Internal/FBSDKAppEventsStateManager.h"
-#import "../AppEvents/Internal/FBSDKAppEventsUtility.h"
-#import "../AppEvents/Internal/Integrity/FBSDKRestrictiveDataFilterManager.h"
-#import "../AppEvents/Internal/FBSDKTimeSpentData.h"
-#import "../AppEvents/Internal/FBSDKUserDataStore.h"
 #import "Base64/FBSDKBase64.h"
 #import "ErrorRecovery/FBSDKErrorRecoveryAttempter.h"
 #import "FBSDKDynamicFrameworkLoader.h"
@@ -152,7 +140,6 @@
 #import "../Basics/Instrument/FBSDKCrashHandler.h"
 #import "../Basics/Instrument/FBSDKLibAnalyzer.h"
 #import "../Basics/Instrument/FBSDKCrashObserving.h"
-#import "Monitoring/FBSDKMonitorHeaders.h"
 #import "Network/FBSDKGraphRequest+Internal.h"
 #import "Network/FBSDKGraphRequestConnection+Internal.h"
 #import "Network/FBSDKGraphRequestMetadata.h"
